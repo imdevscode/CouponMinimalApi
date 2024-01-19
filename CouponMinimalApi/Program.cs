@@ -4,8 +4,8 @@ using CouponMinimalApi.Mapping;
 using CouponMinimalApi.Models;
 using CouponMinimalApi.Models.Params;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Net;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(CouponMappingProfile));
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
@@ -36,10 +37,14 @@ app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
     return Results.Ok(coupon);
 }).WithName("GetCoupon").Produces<Coupon>(200).Produces(404);
 
-app.MapPost("/api/CreateCoupon", (IMapper _mapper, [FromBody] CreateCouponRequest request) =>
+app.MapPost("/api/CreateCoupon", async (IMapper _mapper,
+                                        IValidator<CreateCouponRequest> _validator, 
+                                        [FromBody] CreateCouponRequest request) =>
 {
     APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
-    if (string.IsNullOrEmpty(request.Name))
+    var validation = await _validator.ValidateAsync(request);
+    //if (string.IsNullOrEmpty(request.Name))
+    if (!validation.IsValid)    
     {
         response.ErrorMessage = "Counpon name invalid";
         return Results.BadRequest(response);
