@@ -30,12 +30,19 @@ app.MapGet("/api/coupons", () => Results.Ok(CouponStore.Coupons)).WithName("GetC
 
 app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
 {
+    APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.NotFound };
     _logger.Log(LogLevel.Information, $"Fetching Coupon for id = {id}");
     if (!CouponStore.Coupons.Any(x => x.Id == id))
-        return Results.NotFound("Coupon doesn't exist");
+    {
+        response.ErrorMessage = $"Coupon with Id = {id} doesn't exist";
+        return Results.NotFound(response);
+    }
     Coupon coupon = CouponStore.Coupons.FirstOrDefault(x => x.Id == id);
-    return Results.Ok(coupon);
-}).WithName("GetCoupon").Produces<Coupon>(200).Produces(404);
+    response.IsSuccess = true;
+    response.StatusCode = HttpStatusCode.OK;
+    response.Results = coupon;
+    return Results.Ok(response);
+}).WithName("GetCoupon").Produces<APIResponse>(200).Produces(404);
 
 app.MapPost("/api/CreateCoupon", async (IMapper _mapper,
                                         IValidator<CreateCouponRequest> _validator, 
