@@ -6,6 +6,7 @@ using CouponMinimalApi.Models.Params;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using FluentValidation;
+using CouponMinimalApi.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/api/helloworld", () => "Hello World");
+/*
 app.MapGet("/api/coupons", () => Results.Ok(CouponStore.Coupons)).WithName("GetCoupons");
 
 app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
@@ -73,7 +75,8 @@ app.MapPost("/api/CreateCoupon", async (IMapper _mapper,
 
     return Results.Ok(response);
 }).WithName("CreateCoupon").Accepts<CreateCouponRequest>("application/json").Produces<APIResponse>(200).Produces(400);
-
+*/
+app.ConfigureCouponEndpoints();
 app.UseHttpsRedirection();
 
 
