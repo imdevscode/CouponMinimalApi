@@ -30,8 +30,9 @@ namespace CouponMinimalApi.Endpoints
 
         private static IResult GetCouponById(ILogger<Program> _logger, int id) 
         {
-            APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.NotFound };
-            .
+            APIResponse response = new()
+            { IsSuccess = false, StatusCode = HttpStatusCode.NotFound };
+            
             if (!CouponStore.Coupons.Any(x => x.Id == id))
             {
                 response.ErrorMessage = $"Coupon with Id = {id} doesn't exist";
